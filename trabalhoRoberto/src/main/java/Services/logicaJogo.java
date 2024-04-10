@@ -2,19 +2,17 @@ package Services;
 
 import java.util.Random;
 
-
 import Models.ListaDuplamenteEncadeada;
 import Models.Peca;
 import Views.Output;
 
-public class logicaJogo{
+public class logicaJogo {
 	private DeterminaInicioJogo inicio = new DeterminaInicioJogo();
 	private LogicaComputador cpu = new LogicaComputador();
 	private Random random = new Random();
 	Output saida = new Output();
 	Input Entrada = new Input();
 
-	
 	public void distribuirPecas(ListaDuplamenteEncadeada pecas, ListaDuplamenteEncadeada jogadorPrincipal,
 			ListaDuplamenteEncadeada jogadorcomputador, ListaDuplamenteEncadeada mesaCompra) {
 		Random random = new Random();
@@ -40,8 +38,6 @@ public class logicaJogo{
 		}
 	}
 
-
-
 	public void iniciarJogo(ListaDuplamenteEncadeada pecas, ListaDuplamenteEncadeada jogadorPrincipal,
 			ListaDuplamenteEncadeada jogadorcomputador, ListaDuplamenteEncadeada mesaCompra,
 			ListaDuplamenteEncadeada mesaJogo) {
@@ -54,117 +50,127 @@ public class logicaJogo{
 			jogadorPrincipal.imprimirTodasPecas();
 			mesaJogo.imprimirTodasPecasMesa();
 
-			saida.exibirMensagem("Escolha uma peça pra inserir no jogo ou -1 para comprar peça");
-			int indice = Entrada.receberInputInteiro();
+			saida.exibirMensagem("Escolha uma peça pra inserir no jogo ou (c) para comprar peça");
+			String indice = Entrada.receberInputString();
+			try {
+				int numero = Integer.parseInt(indice);
+				if (numero >= 0 && numero <= jogadorPrincipal.getUltimoIndice()) {
+					saida.exibirMensagem("inserir peça no incio (1) inserir peça no final (2)");
+					int posicao = Entrada.receberInputInteiro();
 
-			if (indice >= 0 && indice <= jogadorPrincipal.getUltimoIndice()) {
-				saida.exibirMensagem("inserir peça no incio (1) inserir peça no final (2)");
-				int posicao = Entrada.receberInputInteiro();
+					switch (posicao) {
+					case 1:
+						saida.exibirMensagem("Deseja girar a peça? (S/N)");
+						String option = Entrada.receberInputString();
+						if (option.equalsIgnoreCase("s")) {
+							jogadorPrincipal.inverterNumerosPeca(numero);
+							if (mesaJogo.estaVazia()
+									|| jogadorPrincipal.getPecaPorIndice(numero).getNumero2() == mesaJogo
+											.getPecaPorIndice(mesaJogo.getPrimeiroIndice()).getNumero1()) {
+								jogadorPrincipal.transferirPecaParaInicio(numero, mesaJogo);
+								cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
+							} else {
+								saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
+								jogadorPrincipal.inverterNumerosPeca(numero);
+							}
+						} else if (option.equalsIgnoreCase("n")) {
+							// Verifica se a peça pode ser encaixada na mesa
+							if (mesaJogo.estaVazia()
+									|| jogadorPrincipal.getPecaPorIndice(numero).getNumero2() == mesaJogo
+											.getPecaPorIndice(mesaJogo.getPrimeiroIndice()).getNumero1()) {
+								jogadorPrincipal.transferirPecaParaInicio(numero, mesaJogo);
+								cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
+							} else {
+								saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
+							}
+						} else {
+							saida.exibirMensagem("Opção incorreta.");
+						}
+						break;
 
-				switch (posicao) {
-				case 1:
-					saida.exibirMensagem("Deseja girar a peça? (S/N)");
-					String option = Entrada.receberInputString();
-					if (option.equalsIgnoreCase("s")) {
-						jogadorPrincipal.inverterNumerosPeca(indice);
-						if (mesaJogo.estaVazia() || jogadorPrincipal.getPecaPorIndice(indice).getNumero2() == mesaJogo
-								.getPecaPorIndice(mesaJogo.getPrimeiroIndice()).getNumero1()) {
-							jogadorPrincipal.transferirPecaParaInicio(indice, mesaJogo);
-							cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
+					case 2:
+						saida.exibirMensagem("deseja girar a peça S / N");
+						option = Entrada.receberInputString();
+
+						if (option.equalsIgnoreCase("s")) {
+							jogadorPrincipal.inverterNumerosPeca(numero);
+							if (mesaJogo.estaVazia()
+									|| jogadorPrincipal.getPecaPorIndice(numero).getNumero1() == mesaJogo
+											.getPecaPorIndice(mesaJogo.getUltimoIndice()).getNumero2()) {
+								jogadorPrincipal.transferirPecaPorIndice(numero, mesaJogo);
+								cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
+							} else {
+								saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
+								jogadorPrincipal.inverterNumerosPeca(numero);
+							}
+						} else if (option.equalsIgnoreCase("n")) {
+							// Verifica se a peça pode ser encaixada na mesa
+							if (mesaJogo.estaVazia()
+									|| jogadorPrincipal.getPecaPorIndice(numero).getNumero1() == mesaJogo
+											.getPecaPorIndice(mesaJogo.getUltimoIndice()).getNumero2()) {
+								jogadorPrincipal.transferirPecaPorIndice(numero, mesaJogo);
+								cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
+							} else {
+								saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
+
+							}
 						} else {
-							saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
-							jogadorPrincipal.inverterNumerosPeca(indice);
+							saida.exibirMensagem("valor incorreto");
 						}
-					} else if (option.equalsIgnoreCase("n")) {
-						// Verifica se a peça pode ser encaixada na mesa
-						if (mesaJogo.estaVazia() || jogadorPrincipal.getPecaPorIndice(indice).getNumero2() == mesaJogo
-								.getPecaPorIndice(mesaJogo.getPrimeiroIndice()).getNumero1()) {
-							jogadorPrincipal.transferirPecaParaInicio(indice, mesaJogo);
-							cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
-						} else {
-							saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
-						}
-					} else {
-						saida.exibirMensagem("Opção incorreta.");
+						break;
+
+					default:
+						saida.exibirMensagem("opcao invalida");
+						break;
 					}
-					break;
 
-				case 2:
-					saida.exibirMensagem("deseja girar a peça S / N");
-					option = Entrada.receberInputString();
-
-					if (option.equalsIgnoreCase("s")) {
-						jogadorPrincipal.inverterNumerosPeca(indice);
-						if (mesaJogo.estaVazia() || jogadorPrincipal.getPecaPorIndice(indice).getNumero1() == mesaJogo
-								.getPecaPorIndice(mesaJogo.getUltimoIndice()).getNumero2()) {
-							jogadorPrincipal.transferirPecaPorIndice(indice, mesaJogo);
-							cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
-						} else {
-							saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
-							jogadorPrincipal.inverterNumerosPeca(indice);
-						}
-					} else if (option.equalsIgnoreCase("n")) {
-						// Verifica se a peça pode ser encaixada na mesa
-						if (mesaJogo.estaVazia() || jogadorPrincipal.getPecaPorIndice(indice).getNumero1() == mesaJogo
-								.getPecaPorIndice(mesaJogo.getUltimoIndice()).getNumero2()) {
-							jogadorPrincipal.transferirPecaPorIndice(indice, mesaJogo);
-							cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
-						} else {
-							saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
-
-						}
-					} else {
-						saida.exibirMensagem("valor incorreto");
-					}
-					break;
-
-				default:
-					saida.exibirMensagem("opcao invalida");
-					break;
 				}
 
-			} else if (indice == -1) {
-				if (!mesaCompra.estaVazia()) {
-					int indiceAleatorio = random.nextInt(mesaCompra.tamanho());
-					mesaCompra.transferirPecaPorIndice(indiceAleatorio, jogadorPrincipal);
-					cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
+			} catch (NumberFormatException e) {
+				if (indice.equalsIgnoreCase("c")) {
+					if (!mesaCompra.estaVazia()) {
+						int indiceAleatorio = random.nextInt(mesaCompra.tamanho());
+						mesaCompra.transferirPecaPorIndice(indiceAleatorio, jogadorPrincipal);
+						cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
+					} else {
+						saida.exibirMensagem("Monte vazio");
+					}
+
 				} else {
-					saida.exibirMensagem("Monte vazio");
+					saida.exibirMensagem("opção incorreta");
 				}
 
-			} else {
-				saida.exibirMensagem("opção incorreta");
 			}
-			
 		}
 		verificarVencedor(pecas, jogadorPrincipal, jogadorcomputador, mesaCompra, mesaJogo);
 	}
+
 	// metodo para verificar o vencedor e encerrar o zerar as peças do jogo
-			public void verificarVencedor(ListaDuplamenteEncadeada pecas, ListaDuplamenteEncadeada jogadorPrincipal,
-					ListaDuplamenteEncadeada jogadorcomputador, ListaDuplamenteEncadeada mesaCompra,
-					ListaDuplamenteEncadeada mesaJogo) {
-				int vitoriasPlayer = 0;
-				int vitoriasCPU = 0;
-				if (jogadorPrincipal.estaVazia()) {
-					vitoriasPlayer++;
-					saida.exibirMensagem("Jogador Principal");
-					saida.exibirMensagem("");
-					saida.exibirMensagem("Jogador Principal Venceu : " + vitoriasPlayer);
-					saida.exibirMensagem("computador venceu : " + vitoriasCPU);
-					jogadorcomputador.imprimirTodasPecas();
-					
-				} else {
-					vitoriasCPU++;
-					saida.exibirMensagem("Jogador Principal");
-					saida.exibirMensagem("");
-					saida.exibirMensagem("Jogador Principal Venceu : " + vitoriasPlayer);
-					saida.exibirMensagem("computador venceu : " + vitoriasCPU);
-					jogadorPrincipal.imprimirTodasPecas();
-				}		
-				jogadorPrincipal.removerTodasPecas();
-				jogadorcomputador.removerTodasPecas();
-				mesaCompra.removerTodasPecas();
-				mesaJogo.removerTodasPecas();
-				pecas.removerTodasPecas();
-			}
+	public void verificarVencedor(ListaDuplamenteEncadeada pecas, ListaDuplamenteEncadeada jogadorPrincipal,
+			ListaDuplamenteEncadeada jogadorcomputador, ListaDuplamenteEncadeada mesaCompra,
+			ListaDuplamenteEncadeada mesaJogo) {
+		int vitoriasPlayer = 0;
+		int vitoriasCPU = 0;
+		if (jogadorPrincipal.estaVazia()) {
+			vitoriasPlayer++;
+			saida.exibirMensagem("Jogador Principal");
+			saida.exibirMensagem("");
+			saida.exibirMensagem("Jogador Principal Venceu : " + vitoriasPlayer);
+			saida.exibirMensagem("computador venceu : " + vitoriasCPU);
+			jogadorcomputador.imprimirTodasPecas();
+
+		} else {
+			vitoriasCPU++;
+			saida.exibirMensagem("Jogador Principal");
+			saida.exibirMensagem("");
+			saida.exibirMensagem("Jogador Principal Venceu : " + vitoriasPlayer);
+			saida.exibirMensagem("computador venceu : " + vitoriasCPU);
+			jogadorPrincipal.imprimirTodasPecas();
+		}
+		jogadorPrincipal.removerTodasPecas();
+		jogadorcomputador.removerTodasPecas();
+		mesaCompra.removerTodasPecas();
+		mesaJogo.removerTodasPecas();
+		pecas.removerTodasPecas();
+	}
 }
