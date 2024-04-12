@@ -12,7 +12,8 @@ public class logicaJogo {
 	private Random random = new Random();
 	Output saida = new Output();
 	Input Entrada = new Input();
-
+	private int vitoriasPlayer = 0;
+	private int vitoriasCPU = 0;
 	public void distribuirPecas(ListaDuplamenteEncadeada pecas, ListaDuplamenteEncadeada jogadorPrincipal,
 			ListaDuplamenteEncadeada jogadorcomputador, ListaDuplamenteEncadeada mesaCompra) {
 		Random random = new Random();
@@ -36,6 +37,11 @@ public class logicaJogo {
 		while (!pecas.estaVazia()) {
 			pecas.transferirPecaPorIndice(0, mesaCompra);
 		}
+		
+		jogadorcomputador.imprimirTodasPecas();
+		jogadorPrincipal.imprimirTodasPecas();
+		mesaCompra.imprimirTodasPecas();
+		pecas.imprimirTodasPecas();
 	}
 
 	public void iniciarJogo(ListaDuplamenteEncadeada pecas, ListaDuplamenteEncadeada jogadorPrincipal,
@@ -50,7 +56,7 @@ public class logicaJogo {
 			jogadorPrincipal.imprimirTodasPecas();
 			mesaJogo.imprimirTodasPecasMesa();
 
-			saida.exibirMensagem("Escolha uma peça pra inserir no jogo ou (c) para comprar peça");
+			saida.exibirMensagem("Escolha uma peça pra inserir no jogo ou (c) para comprar peça ou (p) para passar a vez");
 			String indice = Entrada.receberInputString();
 			try {
 				int numero = Integer.parseInt(indice);
@@ -60,63 +66,49 @@ public class logicaJogo {
 
 					switch (posicao) {
 					case 1:
-						saida.exibirMensagem("Deseja girar a peça? (S/N)");
-						String option = Entrada.receberInputString();
-						if (option.equalsIgnoreCase("s")) {
-							jogadorPrincipal.inverterNumerosPeca(numero);
-							if (mesaJogo.estaVazia()
-									|| jogadorPrincipal.getPecaPorIndice(numero).getNumero2() == mesaJogo
-											.getPecaPorIndice(mesaJogo.getPrimeiroIndice()).getNumero1()) {
-								jogadorPrincipal.transferirPecaParaInicio(numero, mesaJogo);
-								cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
-							} else {
-								saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
-								jogadorPrincipal.inverterNumerosPeca(numero);
-							}
-						} else if (option.equalsIgnoreCase("n")) {
-							// Verifica se a peça pode ser encaixada na mesa
-							if (mesaJogo.estaVazia()
-									|| jogadorPrincipal.getPecaPorIndice(numero).getNumero2() == mesaJogo
-											.getPecaPorIndice(mesaJogo.getPrimeiroIndice()).getNumero1()) {
-								jogadorPrincipal.transferirPecaParaInicio(numero, mesaJogo);
-								cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
-							} else {
-								saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
-							}
+						// Verifica se a peça pode ser encaixada diretamente na mesa
+						if (mesaJogo.estaVazia() ||
+						        jogadorPrincipal.getPecaPorIndice(numero).getNumero2() == mesaJogo.getPecaPorIndice(mesaJogo.getPrimeiroIndice()).getNumero1()) {
+						    jogadorPrincipal.transferirPecaParaInicio(numero, mesaJogo);
+						    cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
 						} else {
-							saida.exibirMensagem("Opção incorreta.");
+						    // Se não puder ser encaixada diretamente, gira a peça
+						    jogadorPrincipal.inverterNumerosPeca(numero);
+
+						    // Verifica se a peça pode ser encaixada após girar
+						    if (mesaJogo.estaVazia() ||
+						            jogadorPrincipal.getPecaPorIndice(numero).getNumero2() == mesaJogo.getPecaPorIndice(mesaJogo.getPrimeiroIndice()).getNumero1()) {
+						        jogadorPrincipal.transferirPecaParaInicio(numero, mesaJogo);
+						        cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
+						    } else {
+						        saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
+						        // Se ainda assim não puder ser encaixada, imprime a mensagem e mantém a peça como está
+						    }
 						}
+
 						break;
 
 					case 2:
-						saida.exibirMensagem("deseja girar a peça S / N");
-						option = Entrada.receberInputString();
-
-						if (option.equalsIgnoreCase("s")) {
-							jogadorPrincipal.inverterNumerosPeca(numero);
-							if (mesaJogo.estaVazia()
-									|| jogadorPrincipal.getPecaPorIndice(numero).getNumero1() == mesaJogo
-											.getPecaPorIndice(mesaJogo.getUltimoIndice()).getNumero2()) {
-								jogadorPrincipal.transferirPecaPorIndice(numero, mesaJogo);
-								cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
-							} else {
-								saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
-								jogadorPrincipal.inverterNumerosPeca(numero);
-							}
-						} else if (option.equalsIgnoreCase("n")) {
-							// Verifica se a peça pode ser encaixada na mesa
-							if (mesaJogo.estaVazia()
-									|| jogadorPrincipal.getPecaPorIndice(numero).getNumero1() == mesaJogo
-											.getPecaPorIndice(mesaJogo.getUltimoIndice()).getNumero2()) {
-								jogadorPrincipal.transferirPecaPorIndice(numero, mesaJogo);
-								cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
-							} else {
-								saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
-
-							}
+						// Verifica se a peça pode ser encaixada diretamente na mesa
+						if (mesaJogo.estaVazia() ||
+						        jogadorPrincipal.getPecaPorIndice(numero).getNumero1() == mesaJogo.getPecaPorIndice(mesaJogo.getUltimoIndice()).getNumero2()) {
+						    jogadorPrincipal.transferirPecaPorIndice(numero, mesaJogo);
+						    cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
 						} else {
-							saida.exibirMensagem("valor incorreto");
+						    // Se não puder ser encaixada diretamente, gira a peça
+						    jogadorPrincipal.inverterNumerosPeca(numero);
+
+						    // Verifica se a peça pode ser encaixada após girar
+						    if (mesaJogo.estaVazia() ||
+						            jogadorPrincipal.getPecaPorIndice(numero).getNumero1() == mesaJogo.getPecaPorIndice(mesaJogo.getUltimoIndice()).getNumero2()) {
+						        jogadorPrincipal.transferirPecaPorIndice(numero, mesaJogo);
+						        cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
+						    } else {
+						        saida.exibirMensagem("A peça não pode ser encaixada na mesa.");
+						        // Se ainda assim não puder ser encaixada, imprime a mensagem e mantém a peça como está
+						    }
 						}
+
 						break;
 
 					default:
@@ -136,8 +128,11 @@ public class logicaJogo {
 						saida.exibirMensagem("Monte vazio");
 					}
 
-				} else {
-					saida.exibirMensagem("opção incorreta");
+				} else if (indice.equalsIgnoreCase("p") && mesaCompra.estaVazia()){
+					saida.exibirMensagem("passou a vez");
+					cpu.logicaCpu(jogadorPrincipal, jogadorcomputador, mesaJogo, mesaCompra);
+				}else {
+					saida.exibirMensagem("opção invalida");
 				}
 
 			}
@@ -149,8 +144,7 @@ public class logicaJogo {
 	public void verificarVencedor(ListaDuplamenteEncadeada pecas, ListaDuplamenteEncadeada jogadorPrincipal,
 			ListaDuplamenteEncadeada jogadorcomputador, ListaDuplamenteEncadeada mesaCompra,
 			ListaDuplamenteEncadeada mesaJogo) {
-		int vitoriasPlayer = 0;
-		int vitoriasCPU = 0;
+		
 		if (jogadorPrincipal.estaVazia()) {
 			vitoriasPlayer++;
 			saida.exibirMensagem("Jogador Principal");

@@ -53,7 +53,7 @@ public class LogicaComputador {
 		// Se nenhuma peça puder ser jogada, o computador compra uma peça
 		if (!mesaCompra.estaVazia()) {
 			int indiceAleatorio = new Random().nextInt(mesaCompra.tamanho());
-			jogadorcomputador.adicionar(mesaCompra.transferirPecaPorIndice(indiceAleatorio, jogadorcomputador));
+			mesaCompra.transferirPecaPorIndice(indiceAleatorio, jogadorcomputador);
 			saida.exibirMensagem("O computador comprou uma peça.");
 			return;
 		} else {

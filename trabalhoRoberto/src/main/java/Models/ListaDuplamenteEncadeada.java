@@ -5,7 +5,7 @@ import Views.Output;
 public class ListaDuplamenteEncadeada {
 	No inicio;
 	No fim;
-	private Output saida = new Output();
+	public Output saida = new Output();
 	public ListaDuplamenteEncadeada() {
 		inicio = null;
 		fim = null;
@@ -102,31 +102,37 @@ public class ListaDuplamenteEncadeada {
 	}
 
 	public Peca transferirPecaPorIndice(int indice, ListaDuplamenteEncadeada listaDestino) {
-		No atual = inicio;
-		int contador = 0;
-		while (atual != null) {
-			if (contador == indice) {
-				// Se encontrou a peça pelo índice, remove da lista atual
-				if (atual.anterior != null) {
-					atual.anterior.proximo = atual.proximo;
-				} else {
-					inicio = atual.proximo;
-				}
-				if (atual.proximo != null) {
-					atual.proximo.anterior = atual.anterior;
-				} else {
-					fim = atual.anterior;
-				}
+	    No atual = inicio;
+	    int contador = 0;
+	    
+	    while (atual != null) {
+	        if (contador == indice) {
+	            // Remove a peça da lista atual
+	            if (atual.anterior != null) {
+	                atual.anterior.proximo = atual.proximo;
+	            } else {
+	                inicio = atual.proximo;
+	            }
+	            if (atual.proximo != null) {
+	                atual.proximo.anterior = atual.anterior;
+	            } else {
+	                fim = atual.anterior;
+	            }
 
-				// Adiciona a peça na lista de destino
-				listaDestino.adicionar(atual.peca);
-				return atual.peca; // Retorna a peça transferida
-			}
-			atual = atual.proximo;
-			contador++;
-		}
-		return null; // Retorna null se o índice for inválido
+	            Peca pecaTransferida = atual.peca;
+
+	            // Adiciona a peça na lista de destino
+	            listaDestino.adicionar(pecaTransferida);
+
+	            // Retorna a peça transferida
+	            return pecaTransferida;
+	        }
+	        atual = atual.proximo;
+	        contador++;
+	    }
+	    return null; // Retorna null se o índice for inválido
 	}
+
 
 	public Peca transferirPecaParaInicio(int indice, ListaDuplamenteEncadeada listaDestino) {
 		No atual = inicio;
